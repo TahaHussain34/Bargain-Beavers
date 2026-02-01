@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ImageUpload } from './components/ImageUpload';
 import { AnalysisResult } from './components/AnalysisResult';
+import { SuccessPage } from './components/SuccessPage';
 import { Loader } from './components/Loader';
 import { analyzeItemImage } from './services/geminiService';
 import { AnalysisState } from './types';
@@ -33,6 +34,75 @@ const App: React.FC = () => {
     setState({ status: 'idle', data: null });
   };
 
+  const parsePriceString = (priceStr: string): number => {
+    if (!priceStr) return 0;
+    // Remove all currency symbols, spaces, etc.
+    let clean = priceStr.replace(/[^\d.,-]/g, ''); 
+    if (!clean || clean === '-') return 0;
+
+    const lastComma = clean.lastIndexOf(',');
+    const lastDot = clean.lastIndexOf('.');
+
+    // Case 1: Both comma and dot exist
+    if (lastComma !== -1 && lastDot !== -1) {
+       if (lastComma > lastDot) {
+           // 1.234,56 -> Euro format
+           clean = clean.replace(/\./g, '').replace(',', '.');
+       } else {
+           // 1,234.56 -> US format
+           clean = clean.replace(/,/g, '');
+       }
+    } 
+    // Case 2: Only Comma
+    else if (lastComma !== -1) {
+       const parts = clean.split(',');
+       // If last part is exactly 3 digits, assume thousands separator (e.g. 3,000)
+       if (parts[parts.length - 1].length === 3) {
+           clean = clean.replace(/,/g, '');
+       } else {
+           clean = clean.replace(',', '.');
+       }
+    }
+    // Case 3: Only Dot
+    else if (lastDot !== -1) {
+       const parts = clean.split('.');
+       // If last part is exactly 3 digits, assume thousands separator (Euro style: 3.000)
+       // This handles the "3.000" -> 3000 case correctly
+       if (parts[parts.length - 1].length === 3) {
+           clean = clean.replace(/\./g, '');
+       }
+       // Else leave it as dot (decimal)
+    }
+
+    return parseFloat(clean) || 0;
+  };
+
+  const handleDealClosed = (finalPrice: number, sellerStartOffer?: number) => {
+    if (!state.data) return;
+
+    const retailPrice = parsePriceString(state.data.retail_price_new);
+    const retailSavings = retailPrice - finalPrice;
+    const negotiationSavings = sellerStartOffer ? (sellerStartOffer - finalPrice) : 0;
+
+    setState({
+        ...state,
+        status: 'deal_closed',
+        finalDealStats: {
+            finalPrice,
+            retailPrice,
+            retailSavings,
+            negotiationSavings,
+            itemName: state.data.item_name,
+            imagePreview: state.imagePreview
+        }
+    });
+  };
+
+  // Render Success Page if deal is closed
+  if (state.status === 'deal_closed' && state.finalDealStats) {
+      return <SuccessPage stats={state.finalDealStats} onReset={handleReset} />;
+  }
+
   return (
     <div className="min-h-screen pb-12 flex flex-col items-center">
       {/* Navbar */}
@@ -42,7 +112,7 @@ const App: React.FC = () => {
             <div className="bg-blue-600 p-1.5 rounded-lg">
               <ShoppingBag className="w-4 h-4 text-white" />
             </div>
-            <h1 className="font-bold text-slate-800 tracking-tight">FleaMarket Hero</h1>
+            <h1 className="font-bold text-slate-800 tracking-tight">apprAIser</h1>
           </div>
           {state.status === 'success' && (
              <button 
@@ -112,7 +182,11 @@ const App: React.FC = () => {
 
         {state.status === 'success' && state.data && (
           <div className="space-y-6 pb-20">
-            <AnalysisResult data={state.data} imagePreview={state.imagePreview} />
+            <AnalysisResult 
+                data={state.data} 
+                imagePreview={state.imagePreview} 
+                onDealClosed={handleDealClosed}
+            />
           </div>
         )}
 

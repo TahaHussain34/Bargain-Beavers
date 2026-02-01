@@ -18,6 +18,7 @@ export interface ItemAnalysis {
   price_range: string;
   suggested_offer_price: string;
   walk_away_price: string;
+  price_reasoning: string;
   negotiation_arguments: string[];
   negotiation_scripts: NegotiationScripts;
   deal_rating: DealRating;
@@ -31,9 +32,19 @@ export interface NegotiationAdvice {
   verdict: 'Buy Now' | 'Negotiate' | 'Walk Away';
 }
 
+export interface FinalDealStats {
+  finalPrice: number;
+  retailPrice: number;
+  retailSavings: number;
+  negotiationSavings: number;
+  itemName: string;
+  imagePreview?: string;
+}
+
 export interface AnalysisState {
-  status: 'idle' | 'analyzing' | 'success' | 'error';
+  status: 'idle' | 'analyzing' | 'success' | 'error' | 'deal_closed';
   data: ItemAnalysis | null;
   error?: string;
   imagePreview?: string;
+  finalDealStats?: FinalDealStats;
 }

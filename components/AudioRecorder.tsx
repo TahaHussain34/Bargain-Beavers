@@ -55,9 +55,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onAudioRecorded, i
 
   if (isProcessing) {
     return (
-      <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center space-y-2 animate-pulse">
-        <Sparkles className="w-6 h-6 text-blue-500 animate-spin" />
-        <p className="text-xs font-bold text-slate-500">Analyzing Seller's Tone...</p>
+      <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center space-y-2 animate-pulse">
+        <Sparkles className="w-5 h-5 text-blue-500 animate-spin" />
+        <p className="text-xs font-bold text-slate-500">Analyzing...</p>
       </div>
     );
   }
@@ -67,23 +67,23 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onAudioRecorded, i
       {!isRecording ? (
         <button
           onClick={startRecording}
-          className="w-full bg-slate-800 hover:bg-slate-900 active:bg-black text-white p-4 rounded-xl flex items-center justify-center space-x-3 transition-all shadow-md active:scale-95"
+          className="w-full bg-white hover:bg-slate-50 text-slate-900 p-4 rounded-xl flex items-center justify-center space-x-3 transition-all shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] active:scale-95 group"
         >
-          <div className="p-1.5 bg-slate-700 rounded-full">
-            <Mic className="w-4 h-4" />
+          <div className="p-2 bg-blue-100 group-hover:bg-blue-200 rounded-full transition-colors">
+            <Mic className="w-5 h-5 text-blue-700" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-bold">Record Seller's Answer</p>
-            <p className="text-xs text-slate-400">Get an instant counter-tactic</p>
+            <p className="text-base font-black">Record Seller's Answer</p>
+            <p className="text-xs text-slate-500 font-medium">Tap to start listening</p>
           </div>
         </button>
       ) : (
         <button
           onClick={stopRecording}
-          className="w-full bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white p-4 rounded-xl flex items-center justify-center space-x-3 transition-all shadow-md animate-pulse"
+          className="w-full bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white p-4 rounded-xl flex items-center justify-center space-x-3 transition-all shadow-lg shadow-rose-900/50 animate-pulse"
         >
           <Square className="w-5 h-5 fill-current" />
-          <span className="font-bold">Stop Recording</span>
+          <span className="font-bold text-base">Stop Recording</span>
         </button>
       )}
     </div>

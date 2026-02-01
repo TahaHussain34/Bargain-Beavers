@@ -1,5 +1,5 @@
 {
-  "name": "FleaMarket Hero AI",
+  "name": "apprAIser",
   "description": "Snap a photo of any item at a flea market to get an instant appraisal, fair price estimation, and winning negotiation strategies.",
   "requestFramePermissions": [
     "camera",
